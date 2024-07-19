@@ -1,5 +1,6 @@
 'use strict';
 
+const { json } = require('body-parser');
 const SudokuSolver = require('../controllers/sudoku-solver.js');
 
 module.exports = function (app) {
@@ -13,6 +14,21 @@ module.exports = function (app) {
 
     if (solver.validate(puzzle) !== 'Valid') {
       return res.json({ error: solver.validate(puzzle) });
+    }
+
+    const row = coordinate.split('')[0];
+    const column = coordinate.split('')[1];
+    if (
+      coordinate.length !== 2 ||
+      !/[a-i]/i.test(row) ||
+      !/[1-9]/i.test(column)
+    ) {
+      console.log('invalid coordinate: ');
+      return res.json({ json: 'Invalid coordinate' });
+    }
+
+    if (!/^[1-9]$/.test(value)) {
+      return res.json({ error: 'Invalid value' });
     }
   });
 
