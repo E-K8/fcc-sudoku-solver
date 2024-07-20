@@ -30,6 +30,11 @@ module.exports = function (app) {
     if (!/^[1-9]$/.test(value)) {
       return res.json({ error: 'Invalid value' });
     }
+
+    let index = (solver.letterToNumber(row) - 1) * 9 + (+column - 1);
+    if (puzzle[index] == value) {
+      return res.json({ valid: true });
+    }
   });
 
   app.route('/api/solve').post((req, res) => {
