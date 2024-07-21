@@ -40,7 +40,7 @@ class SudokuSolver {
   validate(puzzleString) {}
 
   checkRowPlacement(puzzleString, row, column, value) {
-    let grid = this.transform(puzzleString);
+    let grid = this.stringToBoard(puzzleString);
     row = this.letterToNumber(row);
 
     if (grid[row - 1][column - 1] !== 0) {
@@ -55,9 +55,34 @@ class SudokuSolver {
     return true;
   }
 
-  checkColPlacement(puzzleString, row, column, value) {}
+  checkColPlacement(puzzleString, row, column, value) {
+    let grid = this.stringToBoard(puzzleString);
+    row = this.letterToNumber(row);
+    if (grid[row - 1][column - 1] !== 0) {
+      return false;
+    }
+
+    for (let i = 0; i < 9; i++) {
+      if (grid[i][column - 1] == value) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   checkRegionPlacement(puzzleString, row, column, value) {}
+
+  stringToBoard(sudokuString) {
+    const SIZE = 9;
+    const board = [];
+
+    for (let row = 0; row < SIZE; row++) {
+      const start = row * SIZE;
+      const end = start + SIZE;
+      board[row] = sudokuString.substring(start, end).split('');
+    }
+    return board;
+  }
 
   solve(puzzleString) {}
 }
