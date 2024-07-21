@@ -35,6 +35,22 @@ module.exports = function (app) {
     if (puzzle[index] == value) {
       return res.json({ valid: true });
     }
+
+    let validCol = solver.checkColPlacement(puzzle, row, column, value);
+    let validReg = solver.checkRegionPlacement(puzzle, row, column, value);
+    let validRow = solver.checkRowPlacement(puzzle, row, column, value);
+    let conflicts = [];
+
+    if (validCol && validReg && validRow) {
+      res.json({ valid: true });
+    } else {
+      if (!validRow) {
+        conflicts.push('row');
+      }
+      if (!validCol) {
+        conflicts.push('column');
+      }
+    }
   });
 
   app.route('/api/solve').post((req, res) => {

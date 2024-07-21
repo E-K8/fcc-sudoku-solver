@@ -39,7 +39,21 @@ class SudokuSolver {
 
   validate(puzzleString) {}
 
-  checkRowPlacement(puzzleString, row, column, value) {}
+  checkRowPlacement(puzzleString, row, column, value) {
+    let grid = this.transform(puzzleString);
+    row = this.letterToNumber(row);
+
+    if (grid[row - 1][column - 1] !== 0) {
+      return false;
+    }
+
+    for (let i = 0; i < 9; i++) {
+      if (grid[row - 1][i] == value) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   checkColPlacement(puzzleString, row, column, value) {}
 
