@@ -37,15 +37,11 @@ class SudokuSolver {
     }
   }
 
-  validate(puzzleString) {}
+  // validate(puzzleString) {}
 
   checkRowPlacement(puzzleString, row, column, value) {
     let grid = this.stringToBoard(puzzleString);
     row = this.letterToNumber(row);
-
-    if (grid[row - 1][column - 1] !== 0) {
-      return false;
-    }
 
     for (let i = 0; i < 9; i++) {
       if (grid[row - 1][i] == value) {
@@ -58,9 +54,6 @@ class SudokuSolver {
   checkColPlacement(puzzleString, row, column, value) {
     let grid = this.stringToBoard(puzzleString);
     row = this.letterToNumber(row);
-    if (grid[row - 1][column - 1] !== 0) {
-      return false;
-    }
 
     for (let i = 0; i < 9; i++) {
       if (grid[i][column - 1] == value) {
@@ -70,7 +63,22 @@ class SudokuSolver {
     return true;
   }
 
-  checkRegionPlacement(puzzleString, row, column, value) {}
+  checkRegionPlacement(puzzleString, row, column, value) {
+    let grid = this.stringToBoard(puzzleString);
+    row = this.letterToNumber(row);
+
+    let startRow = row - (row % 3);
+    let startCol = column - (column % 3);
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (grid[i + startRow][j + startCol] == value) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   stringToBoard(sudokuString) {
     const SIZE = 9;
@@ -79,7 +87,10 @@ class SudokuSolver {
     for (let row = 0; row < SIZE; row++) {
       const start = row * SIZE;
       const end = start + SIZE;
-      board[row] = sudokuString.substring(start, end).split('');
+      board[row] = sudokuString
+        .substring(start, end)
+        .split('')
+        .map((char) => (char === '.' ? 0 : parseInt(char)));
     }
     return board;
   }
