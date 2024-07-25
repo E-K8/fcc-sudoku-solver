@@ -43,15 +43,15 @@ module.exports = function (app) {
     const validCol = solver.checkColPlacement(puzzle, row, column, value);
     const validReg = solver.checkRegionPlacement(puzzle, row, column, value);
 
-    const conflict = [];
-    if (!validRow) conflict.push('row');
-    if (!validCol) conflict.push('column');
-    if (!validReg) conflict.push('region');
+    const conflicts = [];
+    if (!validRow) conflicts.push('row');
+    if (!validCol) conflicts.push('column');
+    if (!validReg) conflicts.push('region');
 
     if (validRow && validCol && validReg) {
       return res.json({ valid: true });
     } else {
-      return res.json({ valid: false, conflict });
+      return res.json({ valid: false, conflict: conflicts });
     }
   });
 
@@ -63,9 +63,9 @@ module.exports = function (app) {
     }
 
     const solution = solver.solve(puzzle);
-    if (solution.error) {
-      return res.json(solution);
+    if (!solution) {
+      return res.json({ error: 'Puzzle cannot be solved' });
     }
-    return res.json({ solution });
+    return res.json({ solution: solution });
   });
 };
