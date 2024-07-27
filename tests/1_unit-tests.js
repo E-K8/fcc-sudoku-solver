@@ -2,6 +2,7 @@ const chai = require('chai');
 const assert = chai.assert;
 
 const Solver = require('../controllers/sudoku-solver.js');
+const SudokuSolver = require('../controllers/sudoku-solver.js');
 let solver = new Solver();
 
 let validPuzzle =
@@ -27,6 +28,11 @@ suite('Unit Tests', () => {
       let invalidPuzzle =
         '2.84..63.12.7.2..5.....9..1....8.2.3674.3.7.2..9.47...8..1..16....926914.37.';
       assert.equal(solver.solve(invalidPuzzle), false);
+      done();
+    });
+
+    test('Logic handles a valid row placement', function (done) {
+      assert.equal(solver.checkRowPlacement(validPuzzle, 'E', 3, '2'), true);
       done();
     });
   });
