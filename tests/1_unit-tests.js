@@ -40,5 +40,15 @@ suite('Unit Tests', () => {
       assert.equal(solver.checkRowPlacement(validPuzzle, 'E', 5, '4'), false);
       done();
     });
+
+    test('Logic handles a valid column placement', function (done) {
+      assert.equal(solver.checkColPlacement(validPuzzle, 'E', 5, '3'), true);
+      done();
+    });
+
+    test('Logic handles an invalid column placement', function (done) {
+      assert.equal(solver.checkColPlacement(validPuzzle, 'E', 5, '1'), false);
+      done();
+    });
   });
 });
