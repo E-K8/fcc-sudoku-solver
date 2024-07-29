@@ -50,5 +50,18 @@ suite('Unit Tests', () => {
       assert.equal(solver.checkColPlacement(validPuzzle, 'E', 5, '1'), false);
       done();
     });
+
+    test('Logic handles a valid region (3x3 grid) placement', function (done) {
+      assert.equal(solver.checkRegionPlacement(validPuzzle, 'F', 3, '7'), true);
+      done();
+    });
+
+    test('Logic handles an invalid region (3x3 grid) placement', function (done) {
+      assert.equal(
+        solver.checkRegionPlacement(validPuzzle, 'F', 3, '5'),
+        false
+      );
+      done();
+    });
   });
 });
