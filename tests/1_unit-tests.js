@@ -2,6 +2,9 @@ const chai = require('chai');
 const assert = chai.assert;
 
 const Solver = require('../controllers/sudoku-solver.js');
+const {
+  validateUseBuiltInsOption,
+} = require('@babel/preset-env/lib/normalize-options.js');
 // const SudokuSolver = require('../controllers/sudoku-solver.js');
 let solver = new Solver();
 
@@ -60,6 +63,15 @@ suite('Unit Tests', () => {
       assert.equal(
         solver.checkRegionPlacement(validPuzzle, 'F', 3, '5'),
         false
+      );
+      done();
+    });
+
+    test('Valid puzzle strings pass the solver', function (done) {
+      const solvedPuzzle = solver.solve(validPuzzle);
+      assert.equal(
+        solvedPuzzle,
+        '135762984946381257728459613694517832812936745357824196473298561581673429269145378'
       );
       done();
     });
