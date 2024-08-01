@@ -2,10 +2,6 @@ const chai = require('chai');
 const assert = chai.assert;
 
 const Solver = require('../controllers/sudoku-solver.js');
-const {
-  validateUseBuiltInsOption,
-} = require('@babel/preset-env/lib/normalize-options.js');
-// const SudokuSolver = require('../controllers/sudoku-solver.js');
 let solver = new Solver();
 
 let validPuzzle =
@@ -73,6 +69,14 @@ suite('Unit Tests', () => {
         solvedPuzzle,
         '135762984946381257728459613694517832812936745357824196473298561581673429269145378'
       );
+      done();
+    });
+
+    test('Invalid puzzle strings fail the solver', function (done) {
+      let invalidPuzzle =
+        '1.5..2.84..63.12.7.2..5.....9..1....8.2.3674.3.7.2..9.47...8..1..16....926914.37.';
+      const solvedPuzzle = solver.solve(invalidPuzzle);
+      assert.equal(solvedPuzzle, false);
       done();
     });
   });
