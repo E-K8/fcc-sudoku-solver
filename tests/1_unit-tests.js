@@ -1,14 +1,19 @@
 const chai = require('chai');
 const assert = chai.assert;
-
-const Solver = require('../controllers/sudoku-solver.js');
-let solver = new Solver();
+const { puzzlesAndSolutions } = require('../controllers/puzzle-strings.js');
+const SudokuSolver = require('../controllers/sudoku-solver.js');
 
 let validPuzzle =
   '1.5..2.84..63.12.7.2..5.....9..1....8.2.3674.3.7.2..9.47...8..1..16....926914.37.';
 
 suite('Unit Tests', () => {
   suite('solver tests', function () {
+    let solver;
+
+    setup(function () {
+      solver = new SudokuSolver();
+    });
+
     test('Logic handles a valid puzzle string of 81 characters', function (done) {
       let complete =
         '135762984946381257728459613694517832812936745357824196473298561581673429269145378';
@@ -80,4 +85,23 @@ suite('Unit Tests', () => {
       done();
     });
   });
+
+  // option 1 failing
+  // test('Solver returns the expected solution for an incomplete puzzle', function (done) {
+  //   const [puzzle, expectedSolution] = puzzlesAndSolutions[0];
+  //   const solvedPuzzle = solver.solve(puzzle);
+  //   assert.equal(solvedPuzzle, expectedSolution);
+  //   done();
+  // });
+
+  // option 2 failing
+  // test('Solver returns the expected solution for an incomplete puzzle', function (done) {
+  //   assert.equal(
+  //     solver.solve(
+  //       '1357629849463812577284596136945178328129367453578241964732985615816....926914.3.'
+  //     ),
+  //     '135762984946381257728459613694517832812936745357824196473298561581673429269145378'
+  //   );
+  //   done();
+  // });
 });
