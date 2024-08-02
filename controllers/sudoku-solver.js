@@ -1,152 +1,83 @@
 class SudokuSolver {
-  validate(puzzle) {
-    if (!puzzle) {
-      return 'Required field missing';
-    }
-    if (puzzle.length != 81) {
-      return 'Expected puzzle to be 81 characters long';
-    }
-    if (/[^1-9.]/g.test(puzzle)) {
-      return 'Invalid characters in puzzle';
-    }
-    return 'Valid';
-  }
-
-  letterToNumber(row) {
-    switch (row.toUpperCase()) {
-      case 'A':
-        return 1;
-      case 'B':
-        return 2;
-      case 'C':
-        return 3;
-      case 'D':
-        return 4;
-      case 'E':
-        return 5;
-      case 'F':
-        return 6;
-      case 'G':
-        return 7;
-      case 'H':
-        return 8;
-      case 'I':
-        return 9;
-      default:
-        return 'none';
-    }
+  validate(puzzleString) {
+    if (puzzleString.length !== 81)
+      return { error: 'Expected puzzle to be 81 characters long' };
+    if (/[^1-9\.]/.test(puzzleString))
+      return { error: 'Invalid characters in puzzle' };
+    return { valid: true };
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
-    let grid = this.stringToBoard(puzzleString);
-    row = this.letterToNumber(row);
-
-    for (let i = 0; i < 9; i++) {
-      if (grid[row - 1][i] == value) {
-        return false;
-      }
+    const grid = this.convertToGrid(puzzleString);
+    for (let col = 0; col < 9; col++) {
+      if (grid[row][col] === value) return false;
     }
     return true;
   }
 
   checkColPlacement(puzzleString, row, column, value) {
-    let grid = this.stringToBoard(puzzleString);
-    row = this.letterToNumber(row);
-
-    for (let i = 0; i < 9; i++) {
-      if (grid[i][column - 1] == value) {
-        return false;
-      }
+    const grid = this.convertToGrid(puzzleString);
+    for (let r = 0; r < 9; r++) {
+      if (grid[r][column] === value) return false;
     }
     return true;
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
-    let grid = this.stringToBoard(puzzleString);
-    row = this.letterToNumber(row);
+    const grid = this.convertToGrid(puzzleString);
+    const regionRowStart = Math.floor(row / 3) * 3;
+    const regionColStart = Math.floor(column / 3) * 3;
 
-    let startRow = row - (row % 3);
-    let startCol = column - (column % 3);
-
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (grid[i + startRow][j + startCol] == value) {
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        if (grid[regionRowStart + r][regionColStart + c] === value)
           return false;
-        }
       }
     }
     return true;
   }
 
-  stringToBoard(sudokuString) {
-    const SIZE = 9;
-    const board = [];
-
-    for (let row = 0; row < SIZE; row++) {
-      const start = row * SIZE;
-      const end = start + SIZE;
-      board[row] = sudokuString
-        .substring(start, end)
-        .split('')
-        .map((char) => (char === '.' ? '.' : char));
+  convertToGrid(puzzleString) {
+    const grid = [];
+    for (let i = 0; i < 81; i += 9) {
+      grid.push(puzzleString.slice(i, i + 9).split(''));
     }
-    return board;
-  }
-
-  solveSudoku(board) {
-    const SIZE = 9;
-    const BOX_SIZE = 3;
-    const EMPTY = '.';
-
-    function canPlace(board, row, col, num) {
-      for (let x = 0; x < SIZE; x++) {
-        if (board[row][x] === num || board[x][col] === num) {
-          return false;
-        }
-      }
-
-      const startRow = row - (row % BOX_SIZE);
-      const startCol = col - (col % BOX_SIZE);
-
-      for (let i = 0; i < BOX_SIZE; i++) {
-        for (let j = 0; j < BOX_SIZE; j++) {
-          if (board[i + startRow][j + startCol] === num) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-
-    function solve() {
-      for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
-          if (board[row][col] === EMPTY) {
-            for (let num = 1; num <= SIZE; num++) {
-              if (canPlace(board, row, col, num.toString())) {
-                board[row][col] = num.toString();
-                if (solve()) {
-                  return true;
-                }
-                board[row][col] = EMPTY;
-              }
-            }
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return solve() ? board : false;
+    return grid;
   }
 
   solve(puzzleString) {
-    const board = this.stringToBoard(puzzleString);
-    const solvedBoard = this.solveSudoku(board);
-    if (!solvedBoard) {
-      return false;
+    const validateResult = this.validate(puzzleString);
+    if (!validateResult.valid) return validateResult;
+
+    const grid = this.convertToGrid(puzzleString);
+    if (this.solveGrid(grid)) {
+      return { solution: grid.flat().join('') };
+    } else {
+      return { error: 'Puzzle cannot be solved' };
     }
-    return solvedBoard.flat().join('');
+  }
+
+  solveGrid(grid) {
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (grid[row][col] === '.') {
+          for (let value = 1; value <= 9; value++) {
+            const char = value.toString();
+            if (
+              this.checkRowPlacement(grid.flat().join(''), row, col, char) &&
+              this.checkColPlacement(grid.flat().join(''), row, col, char) &&
+              this.checkRegionPlacement(grid.flat().join(''), row, col, char)
+            ) {
+              grid[row][col] = char;
+              if (this.solveGrid(grid)) return true;
+              grid[row][col] = '.';
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }
 
