@@ -1,29 +1,22 @@
 'use strict';
 
-const { json } = require('body-parser');
 const SudokuSolver = require('../controllers/sudoku-solver.js');
+const solver = new SudokuSolver();
 
 module.exports = function (app) {
-  let solver = new SudokuSolver();
-
   app.route('/api/check').post((req, res) => {
     const { puzzle, coordinate, value } = req.body;
+
     if (!puzzle || !coordinate || !value) {
       return res.json({ error: 'Required field(s) missing' });
     }
 
-    const validationError = solver.validate(puzzle);
-    if (validationError !== 'Valid') {
-      return res.json({ error: validationError });
+    const validationResult = solver.validate(puzzle);
+    if (!validationResult.valid) {
+      return res.json(validationResult);
     }
 
-    const row = coordinate[0];
-    const column = coordinate[1];
-    if (
-      coordinate.length !== 2 ||
-      !/[a-i]/i.test(row) ||
-      !/[1-9]/.test(column)
-    ) {
+    if (!/^[A-I][1-9]$/.test(coordinate)) {
       return res.json({ error: 'Invalid coordinate' });
     }
 
@@ -31,24 +24,26 @@ module.exports = function (app) {
       return res.json({ error: 'Invalid value' });
     }
 
-    const rowIndex = solver.letterToNumber(row);
-    const columnIndex = parseInt(column);
-    const puzzleIndex = (rowIndex - 1) * 9 + (columnIndex - 1);
+    const row = coordinate.charCodeAt(0) - 65; // Convert 'A'-'I' to 0-8
+    const column = parseInt(coordinate[1]) - 1; // Convert '1'-'9' to 0-8
 
-    if (puzzle[puzzleIndex] == value) {
+    const grid = solver.convertToGrid(puzzle);
+    if (grid[row][column] === value) {
       return res.json({ valid: true });
     }
 
-    const validRow = solver.checkRowPlacement(puzzle, row, column, value);
-    const validCol = solver.checkColPlacement(puzzle, row, column, value);
-    const validReg = solver.checkRegionPlacement(puzzle, row, column, value);
-
     const conflicts = [];
-    if (!validRow) conflicts.push('row');
-    if (!validCol) conflicts.push('column');
-    if (!validReg) conflicts.push('region');
+    if (!solver.checkRowPlacement(puzzle, row, column, value)) {
+      conflicts.push('row');
+    }
+    if (!solver.checkColPlacement(puzzle, row, column, value)) {
+      conflicts.push('column');
+    }
+    if (!solver.checkRegionPlacement(puzzle, row, column, value)) {
+      conflicts.push('region');
+    }
 
-    if (validRow && validCol && validReg) {
+    if (conflicts.length === 0) {
       return res.json({ valid: true });
     } else {
       return res.json({ valid: false, conflict: conflicts });
@@ -57,15 +52,17 @@ module.exports = function (app) {
 
   app.route('/api/solve').post((req, res) => {
     const puzzle = req.body.puzzle;
-    const validationError = solver.validate(puzzle);
-    if (validationError !== 'Valid') {
-      return res.json({ error: validationError });
+
+    if (!puzzle) {
+      return res.json({ error: 'Required field missing' });
     }
 
-    const solution = solver.solve(puzzle);
-    if (!solution) {
-      return res.json({ error: 'Puzzle cannot be solved' });
+    const validationResult = solver.validate(puzzle);
+    if (!validationResult.valid) {
+      return res.json(validationResult);
     }
-    return res.json({ solution: solution });
+
+    const solutionResult = solver.solve(puzzle);
+    return res.json(solutionResult);
   });
 };
