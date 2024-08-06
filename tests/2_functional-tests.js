@@ -69,5 +69,20 @@ suite('Functional Tests', () => {
           done();
         });
     });
+
+    test('Solve a puzzle that cannot be solved', (done) => {
+      chai
+        .request(server)
+        .post('/api/solve')
+        .send({
+          puzzle:
+            '..839.7.575.....964..1.......16.29846.9.333.7..754.....62..5.78.8...3.2...492...1',
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.error, 'Puzzle cannot be solved');
+          done();
+        });
+    });
   });
 });
