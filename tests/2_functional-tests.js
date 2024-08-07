@@ -85,4 +85,23 @@ suite('Functional Tests', () => {
         });
     });
   });
+
+  suite('POST /api/check', () => {
+    test('Check a puzzle placement with all fields', (done) => {
+      chai
+        .request(server)
+        .post('/api/check')
+        .send({
+          puzzle:
+            '5..91372.3...8.5.9.9.25..8.68.47.23...95..46.7.4.....5.2.......4..8916..85.72...3',
+          coordinate: 'A4',
+          value: '9',
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.isTrue(res.body.valid);
+          done();
+        });
+    });
+  });
 });
