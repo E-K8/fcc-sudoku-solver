@@ -179,5 +179,22 @@ suite('Functional Tests', () => {
           done();
         });
     });
+
+    test('Check a puzzle placement with invalid characters', (done) => {
+      chai
+        .request(server)
+        .post('/api/check')
+        .send({
+          puzzle:
+            '.7.89.....&....3.4.2..4..1.5689..472...6.....1.7.5.63873.1.2.8.6..47.1..2.9.387.6',
+          coordinate: 'A2',
+          value: '3',
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.error, 'Invalid characters in puzzle');
+          done();
+        });
+    });
   });
 });
