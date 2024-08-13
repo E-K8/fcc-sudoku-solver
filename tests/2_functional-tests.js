@@ -196,5 +196,25 @@ suite('Functional Tests', () => {
           done();
         });
     });
+
+    test('Check a puzzle placement with incorrect length', (done) => {
+      chai
+        .request(server)
+        .post('/api/check')
+        .send({
+          puzzle:
+            '82..4..6...16..89...98315.749.157.............53..4...96.415..81..7632..3...28.51234',
+          coordinate: 'A2',
+          value: '3',
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(
+            res.body.error,
+            'Expected puzzle to be 81 characters long'
+          );
+          done();
+        });
+    });
   });
 });
