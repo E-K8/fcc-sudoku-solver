@@ -216,5 +216,22 @@ suite('Functional Tests', () => {
           done();
         });
     });
+
+    test('Check a puzzle placement with invalid placement coordinate', (done) => {
+      chai
+        .request(server)
+        .post('/api/check')
+        .send({
+          puzzle:
+            '..839.7.575.....964..1.......16.29846.9.312.7..754.....62..5.78.8...3.2...492...1',
+          coordinate: 'Z2',
+          value: '3',
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.error, 'Invalid coordinate');
+          done();
+        });
+    });
   });
 });
